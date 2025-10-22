@@ -1,9 +1,13 @@
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
+import logging
 
 from database.models.Product import Product 
 
+logger = logging.getLogger(__name__)
+
 def create_products(db: Session, product_list: List[Dict[str, Any]]):
+    logger.debug(f"Creating {len(product_list)} products")
     products_to_add = []
     
     for item in product_list:
@@ -14,6 +18,7 @@ def create_products(db: Session, product_list: List[Dict[str, Any]]):
             existing_product = db.query(Product).filter(Product.title == title_to_check).first()
             
             if existing_product:
+                logger.debug(f"Product with title '{title_to_check}' already exists, skipping")
                 continue 
         
         product_data.pop('id', None)
@@ -24,8 +29,12 @@ def create_products(db: Session, product_list: List[Dict[str, Any]]):
     if products_to_add:
         db.add_all(products_to_add)
         db.commit()
+        logger.debug(f"Successfully added {len(products_to_add)} new products")
+    else:
+        logger.debug("No new products to add")
 
 def get_all_products(db: Session) -> List[Dict[str, Any]]:
+    logger.debug("Retrieving all products")
     rows = db.query(Product).all()
     products = []
     for r in rows:
@@ -35,4 +44,5 @@ def get_all_products(db: Session) -> List[Dict[str, Any]]:
             "description": r.description or "",
             "category": r.category or ""
         })
+    logger.debug(f"Retrieved {len(products)} products")
     return products

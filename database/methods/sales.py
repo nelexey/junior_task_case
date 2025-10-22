@@ -1,11 +1,15 @@
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
-
-from database.models.Sale import Sale
 from datetime import date
 from decimal import Decimal
+import logging
+
+from database.models.Sale import Sale
+
+logger = logging.getLogger(__name__)
 
 def create_sales(db: Session, sales_list: List[Dict[str, Any]]):
+    logger.debug(f"Creating {len(sales_list)} sales records")
     sales_to_add = []
     
     for item in sales_list:
@@ -22,3 +26,6 @@ def create_sales(db: Session, sales_list: List[Dict[str, Any]]):
     if sales_to_add:
         db.add_all(sales_to_add)
         db.commit()
+        logger.debug(f"Successfully added {len(sales_to_add)} sales records")
+    else:
+        logger.debug("No sales records to add")
