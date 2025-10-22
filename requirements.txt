@@ -1,0 +1,7 @@
+aiohttp
+sqlalchemy
+pandas
+matplotlib
+pydantic-settings
+pytest
+pytest-asyncio
